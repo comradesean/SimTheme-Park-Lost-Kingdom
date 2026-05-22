@@ -14,7 +14,7 @@ This walks through how `BullfrogPlug-In.exe` (a 1998 InstallShield PFTW installe
 | File | Size | Notes |
 |---|---|---|
 | `original/BullfrogPlug-In.exe` | 1,469,760 | The corrupted Wayback download |
-| `manual WIP/BullfrogPlug-In.exe` | 1,464,214 | A "frankensteined" reference — parts from a different but related installer of the same era |
+| `wip/BullfrogPlug-In.exe` | 1,464,214 | A "frankensteined" reference — parts from a different but related installer of the same era |
 
 ## Step 1: Identify the corruption pattern
 
@@ -97,7 +97,7 @@ All seven sit inside the `Bullfrog.dat` portion of the payload — the part uniq
 ## Step 5: Verify
 
 ```
-$ 7z t repaired/BullfrogPlug-In.exe
+$ 7z t BullfrogPlug-In.exe
 Everything is Ok
 
 Files: 16
@@ -119,7 +119,7 @@ If your file lacks both a reference and an internal checksum, you're stuck with 
 ## Reproducing the repair
 
 ```
-python3 repair.py original/BullfrogPlug-In.exe "manual WIP/BullfrogPlug-In.exe" repaired/BullfrogPlug-In.exe
+python3 repair.py original/BullfrogPlug-In.exe wip/BullfrogPlug-In.exe BullfrogPlug-In.exe
 ```
 
 Output SHA-256: `7642116c8ecd304bfd280817a33f5a54ccc17ae7ef667444380c39d93356575c`
