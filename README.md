@@ -9,12 +9,30 @@ This walks through how `BullfrogPlug-In.exe` (a 1998 InstallShield PFTW installe
 - Stage 1: align against a "good enough" reference file to identify ~99.9% of insertions.
 - Stage 2: use the appended CAB's per-block checksums to find the handful of legitimate `0D 0A` pairs that stage 1 wrongly stripped.
 
-## Inputs
+If you just want the working file, grab it from the [Releases page](https://github.com/comradesean/SimTheme-Park-Lost-Kingdom/releases) — no need to clone the repo.
 
-| File | Size | Notes |
+## Repository layout
+
+```
+.
+├── BullfrogPlug-In.exe   ← the fully repaired output (root)
+├── original/
+│   └── BullfrogPlug-In.exe   ← the corrupted input
+├── wip/
+│   └── BullfrogPlug-In.exe   ← the manual-repair reference
+├── repair.py             ← reference-driven repair script
+├── repair_no_ref.py      ← reference-free repair script
+├── README.md             ← this file
+└── LICENSE
+```
+
+| Path | Size | What it is |
 |---|---|---|
-| `original/BullfrogPlug-In.exe` | 1,469,760 | The corrupted Wayback download |
-| `wip/BullfrogPlug-In.exe` | 1,464,214 | A "frankensteined" reference — parts from a different but related installer of the same era |
+| `BullfrogPlug-In.exe` (root) | 1,464,222 | **The repaired file.** Passes `7z t` with no errors; all 16 internal files extract cleanly including the 915,526-byte `Bullfrog.dat` payload. SHA-256 `7642116c…356575c`. Also available as a download on the [Releases page](https://github.com/comradesean/SimTheme-Park-Lost-Kingdom/releases). |
+| `original/BullfrogPlug-In.exe` | 1,469,760 | **The corrupted input.** The Wayback Machine copy with 5,538 stray `0x0A` bytes inserted after standalone `0x0D` bytes by an FTP ASCII-mode upload. This is the *only* known copy on the public internet that's not damaged in some other way. |
+| `wip/BullfrogPlug-In.exe` | 1,464,214 | **The "frankensteined" reference.** A manual repair attempt that grafts bytes from a different-but-related Bullfrog/EA installer from the same era. The first ~650 KB matches the true original; the rest doesn't (compressed payload differs). Useful as an alignment reference for stage 1 of `repair.py`, but `7z t` reports a data error on `Bullfrog.dat` — i.e. this file alone won't extract correctly. The CAB checksums in this file are still the unmodified Microsoft canonical csums, so nothing was faked. |
+| `repair.py` | — | Reference-driven, two-stage repair (alignment + CAB CFDATA csum oracle). Reads the corrupted input and the WIP reference, produces the repaired output. |
+| `repair_no_ref.py` | — | Reference-free, four-stage repair (aggressive strip + DOS stub template + PE-string heuristic + CAB csum). Reads only the corrupted input and produces a byte-identical output to `repair.py`. |
 
 ## Step 1: Identify the corruption pattern
 
